@@ -228,11 +228,29 @@ def merge_excel_data(
                     if value is not None and value != "":
                         # Try to convert numeric strings to numbers
                         if isinstance(value, str):
-                            # Clean Patient ID - extract only digits
+                            # Clean Patient ID - extract only digits and convert to integer
                             if field_name == "ID Patient":
                                 import re
                                 digits_only = re.sub(r'\D', '', value)
-                                converted_value = digits_only if digits_only else value.strip()
+                                if digits_only:
+                                    try:
+                                        converted_value = int(digits_only)
+                                    except ValueError:
+                                        converted_value = digits_only
+                                else:
+                                    converted_value = value.strip()
+                            # Convert "Modèle implanté" to integer (it's a number)
+                            elif field_name == "Modèle implanté":
+                                try:
+                                    # Extract digits and convert to integer
+                                    import re
+                                    digits_only = re.sub(r'\D', '', value)
+                                    if digits_only:
+                                        converted_value = int(digits_only)
+                                    else:
+                                        converted_value = value.strip()
+                                except (ValueError, AttributeError):
+                                    converted_value = value.strip()
                             # Try to convert to number for numeric fields
                             elif field_name in ["AL", "ACD epit", "LT", "PACHY (mm)", "WTW (mm)", 
                                                "PUISSANCE IOL", "TORIQUE PROG EDOF", "K1", "K2", "Âge"]:
