@@ -1,4 +1,3 @@
-import pandas as pd
 from typing import List, Dict, Optional
 import io
 from openpyxl import load_workbook
