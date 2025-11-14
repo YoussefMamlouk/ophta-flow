@@ -12,15 +12,15 @@ const ProcessButton: React.FC<ProcessButtonProps> = ({ onClick, disabled, proces
       type="button"
       onClick={onClick}
       disabled={disabled || processing}
-      className={`w-full px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform ${
+      className={`w-full px-6 py-3.5 rounded-lg font-semibold text-base transition-all duration-200 ${
         disabled || processing
-          ? 'bg-gray-400 cursor-not-allowed text-white shadow-none'
-          : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]'
+          ? 'bg-gray-300 cursor-not-allowed text-gray-500'
+          : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg active:scale-[0.98]'
       } flex items-center justify-center gap-2`}
     >
       {processing ? (
         <>
-          <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
@@ -28,7 +28,9 @@ const ProcessButton: React.FC<ProcessButtonProps> = ({ onClick, disabled, proces
         </>
       ) : (
         <>
-          <span className="text-xl">⚡</span>
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
           <span>Traiter les PDF</span>
         </>
       )}
