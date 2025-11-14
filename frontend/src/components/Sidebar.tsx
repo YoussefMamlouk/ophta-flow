@@ -7,7 +7,8 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ selectedMachine, onMachineChange }) => {
   const machines = [
-    { id: 'IOL700', name: 'IOL700', icon: '🔬' }
+    { id: 'IOL700', name: 'IOL700', icon: '🔬', disabled: false },
+    { id: 'Pentacam', name: 'Pentacam', icon: '📐', disabled: true }
   ];
 
   return (
@@ -34,16 +35,22 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedMachine, onMachineChange }) =
           {machines.map((machine) => (
             <button
               key={machine.id}
-              onClick={() => onMachineChange(machine.id)}
+              onClick={() => !machine.disabled && onMachineChange(machine.id)}
+              disabled={machine.disabled}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                selectedMachine === machine.id
+                machine.disabled
+                  ? 'text-blue-200/40 cursor-not-allowed opacity-50'
+                  : selectedMachine === machine.id
                   ? 'bg-white/20 text-white shadow-lg backdrop-blur-sm border border-white/30'
                   : 'text-blue-100 hover:bg-white/10 hover:text-white'
               }`}
             >
               <span className="text-xl">{machine.icon}</span>
               <span className="font-medium">{machine.name}</span>
-              {selectedMachine === machine.id && (
+              {machine.disabled && (
+                <span className="ml-auto text-xs bg-white/10 px-2 py-1 rounded-full">Soon</span>
+              )}
+              {!machine.disabled && selectedMachine === machine.id && (
                 <span className="ml-auto text-xs bg-white/20 px-2 py-1 rounded-full">✓</span>
               )}
             </button>
