@@ -2,9 +2,9 @@ services:
   - type: web
     name: ophta-flow-backend
     env: python
-    pythonVersion: "3.11"
+    pythonVersion: "3.11.9"
     rootDir: backend
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     plan: free
 
