@@ -18,9 +18,17 @@ logger = logging.getLogger(__name__)
 app = FastAPI(title="Ophthalmology PDF Data Extractor")
 
 # Add CORS middleware for frontend
+# Get frontend URL from environment variable, fallback to localhost for development
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify actual frontend URL
+    allow_origins=[
+        FRONTEND_URL,
+        "http://localhost:3000",
+        "http://localhost:5173",  # Vite default port
+        "*"  # Allow all in development, restrict in production
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -102,3 +102,28 @@ The application extracts the following fields from PDFs:
 - Duplicate rows (same Patient ID + Eye) are automatically skipped
 - Excel structure is preserved (row 1 + column headers in row 2)
 
+## Deployment
+
+Pour déployer l'application en ligne, consultez le guide complet dans [DEPLOYMENT.md](./DEPLOYMENT.md).
+
+### Déploiement rapide
+
+**Backend (Render - 100% GRATUIT)**:
+1. Allez sur [render.com](https://render.com) et créez un compte gratuit
+2. Créez un nouveau "Web Service"
+3. Connectez votre repository GitHub
+4. Configurez:
+   - Root Directory: `backend`
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+5. Sélectionnez le plan "Free"
+6. Déployez!
+
+**Frontend (Vercel)**:
+1. Connectez votre repository GitHub
+2. Sélectionnez le dossier `frontend/`
+3. Ajoutez la variable d'environnement `VITE_API_URL` avec l'URL de votre backend
+4. Déployez
+
+Pour plus de détails, voir [DEPLOYMENT.md](./DEPLOYMENT.md).
+

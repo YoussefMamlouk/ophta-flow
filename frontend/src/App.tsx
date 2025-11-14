@@ -39,7 +39,8 @@ function App() {
         formData.append('excel_file', excelFile);
       }
 
-      const response = await axios.post('http://localhost:8000/extract', formData, {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const response = await axios.post(`${apiUrl}/extract`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
