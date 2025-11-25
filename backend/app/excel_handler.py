@@ -216,10 +216,27 @@ def merge_excel_data(
             # Write data to appropriate columns only
             # This preserves any formulas in other columns
             logger.info(f"Writing data to row {new_row_idx}")
+            
+            # Map new field names to old column names (for backward compatibility)
+            field_name_mapping = {
+                "K1": "PUISSANCE IOL",
+                "K2": "TORIQUE PROG EDOF",
+                "Axe": "Modèle implanté"
+            }
+            
             written_count = 0
             for field_name, value in row_data.items():
-                if field_name in column_map:
-                    col_idx = column_map[field_name]
+                # Try to find column using field_name first
+                col_idx = column_map.get(field_name)
+                
+                # If not found, try alternative name (for backward compatibility)
+                if col_idx is None and field_name in field_name_mapping:
+                    alt_name = field_name_mapping[field_name]
+                    col_idx = column_map.get(alt_name)
+                    if col_idx:
+                        logger.info(f"  Using alternative column name '{alt_name}' for '{field_name}'")
+                
+                if col_idx is not None:
                     cell = ws.cell(row=new_row_idx, column=col_idx)
                     
                     # Convert value to appropriate type
@@ -238,8 +255,8 @@ def merge_excel_data(
                                         converted_value = digits_only
                                 else:
                                     converted_value = value.strip()
-                            # Convert "Modèle implanté" to integer (it's a number)
-                            elif field_name == "Modèle implanté":
+                            # Convert "Axe" or "Modèle implanté" to integer (it's a number)
+                            elif field_name in ["Axe", "Modèle implanté"]:
                                 try:
                                     # Extract digits and convert to integer
                                     import re
@@ -270,7 +287,7 @@ def merge_excel_data(
                     written_count += 1
                     logger.info(f"  ✓ Written '{field_name}' = '{converted_value}' ({type(converted_value).__name__}) to column {col_idx} (row {new_row_idx})")
                 else:
-                    logger.warning(f"  ✗ Field '{field_name}' not found in column_map")
+                    logger.warning(f"  ✗ Field '{field_name}' not found in column_map (tried: {field_name}, {field_name_mapping.get(field_name, 'N/A')})")
             
             logger.info(f"Row {new_row_idx}: Written {written_count}/{len(row_data)} fields")
             # Move to next row for next iteration
@@ -320,7 +337,7 @@ def create_excel_from_rows(new_rows: List[Dict[str, any]], output_path: str) -> 
     # Define expected columns
     columns = [
         "ID Patient", "Âge", "Œil", "AL", "PACHY (mm)", "ACD epit",
-        "LT", "PUISSANCE IOL", "TORIQUE PROG EDOF", "WTW (mm)"
+        "LT", "K1", "K2", "WTW (mm)", "Axe"
     ]
     
     # Write empty row 1
