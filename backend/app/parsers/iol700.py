@@ -22,7 +22,7 @@ class IOL700Parser(BaseParser):
         "K1": "K1",
         "K2": "K2",
         "WTW": "WTW (mm)",
-        "Modèle implanté": "axe"
+        "Modèle implanté": "Axe"
     }
     
     def parse(self, pdf_path: str) -> List[Dict[str, any]]:
@@ -367,13 +367,13 @@ class IOL700Parser(BaseParser):
                                             od_data[excel_col] = val
                                             logger.info(f"    OD: {excel_col} = {val} (from column {col_idx})")
                                 
-                                # Extract "axe" - look for "@" followed by number and degree symbol
+                                # Extract "Modèle implanté" - look for "@" followed by number and degree symbol
                                 # Check if K1 is in this cell (since "@" is next to K1)
-                                if "K1" in cell_text_upper and "axe" not in od_data:
+                                if "K1" in cell_text_upper and "Axe" not in od_data:
                                     modele_val = self._extract_modele_implante(cell_text, row, col_idx)
                                     if modele_val:
-                                        od_data["axe"] = modele_val
-                                        logger.info(f"    OD: axe = {modele_val} (from column {col_idx})")
+                                        od_data["Axe"] = modele_val
+                                        logger.info(f"    OD: Axe = {modele_val} (from column {col_idx})")
                         else:  # OS columns (4+)
                             cell = row[col_idx]
                             if cell:
@@ -389,13 +389,13 @@ class IOL700Parser(BaseParser):
                                             os_data[excel_col] = val
                                             logger.info(f"    OS: {excel_col} = {val} (from column {col_idx})")
                                 
-                                # Extract "axe" - look for "@" followed by number and degree symbol
+                                # Extract "Modèle implanté" - look for "@" followed by number and degree symbol
                                 # Check if K1 is in this cell (since "@" is next to K1)
-                                if "K1" in cell_text_upper and "axe" not in os_data:
+                                if "K1" in cell_text_upper and "Axe" not in os_data:
                                     modele_val = self._extract_modele_implante(cell_text, row, col_idx)
                                     if modele_val:
-                                        os_data["axe"] = modele_val
-                                        logger.info(f"    OS: axe = {modele_val} (from column {col_idx})")
+                                        os_data["Axe"] = modele_val
+                                        logger.info(f"    OS: Axe = {modele_val} (from column {col_idx})")
             
             # Fallback: try the original method if no structured extraction worked
             if not od_data and not os_data:
@@ -533,7 +533,7 @@ class IOL700Parser(BaseParser):
         return ""
     
     def _extract_modele_implante(self, cell_text: str, row: List, col_idx: int) -> str:
-        """Extract 'axe' value - looks for '@' followed by number and degree symbol."""
+        """Extract 'Modèle implanté' value - looks for '@' followed by number and degree symbol."""
         import re
         # Pattern: "@" followed by optional spaces, then number, then degree symbol (°)
         # Look in current cell first
