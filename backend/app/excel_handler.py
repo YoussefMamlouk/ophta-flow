@@ -238,8 +238,8 @@ def merge_excel_data(
                                         converted_value = digits_only
                                 else:
                                     converted_value = value.strip()
-                            # Convert "Modèle implanté" to integer (it's a number)
-                            elif field_name == "Modèle implanté":
+                            # Convert "axe" to integer (it's a number)
+                            elif field_name == "axe":
                                 try:
                                     # Extract digits and convert to integer
                                     import re
@@ -252,7 +252,7 @@ def merge_excel_data(
                                     converted_value = value.strip()
                             # Try to convert to number for numeric fields
                             elif field_name in ["AL", "ACD epit", "LT", "PACHY (mm)", "WTW (mm)", 
-                                               "PUISSANCE IOL", "TORIQUE PROG EDOF", "K1", "K2", "Âge"]:
+                                               "K1", "K2", "Âge"]:
                                 try:
                                     # Replace comma with dot for decimal separator
                                     num_str = value.replace(",", ".").strip()
@@ -320,7 +320,7 @@ def create_excel_from_rows(new_rows: List[Dict[str, any]], output_path: str) -> 
     # Define expected columns
     columns = [
         "ID Patient", "Âge", "Œil", "AL", "PACHY (mm)", "ACD epit",
-        "LT", "PUISSANCE IOL", "TORIQUE PROG EDOF", "WTW (mm)"
+        "LT", "K1", "K2", "WTW (mm)"
     ]
     
     # Write empty row 1

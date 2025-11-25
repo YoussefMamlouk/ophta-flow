@@ -19,10 +19,10 @@ class IOL700Parser(BaseParser):
         "CCT": "PACHY (mm)",
         "ACD": "ACD epit",
         "LT": "LT",
-        "K1": "PUISSANCE IOL",
-        "K2": "TORIQUE PROG EDOF",
+        "K1": "K1",
+        "K2": "K2",
         "WTW": "WTW (mm)",
-        "Modèle implanté": "Modèle implanté"
+        "Modèle implanté": "axe"
     }
     
     def parse(self, pdf_path: str) -> List[Dict[str, any]]:
@@ -286,7 +286,7 @@ class IOL700Parser(BaseParser):
                         # Check for pattern like "AL: 24,18 mm" or "AL: 24.18 mm"
                         for meas_label, excel_col in [("AL", "AL"), ("CCT", "PACHY (mm)"), 
                                                       ("ACD", "ACD epit"), ("LT", "LT"),
-                                                      ("K1", "PUISSANCE IOL"), ("K2", "TORIQUE PROG EDOF"),
+                                                      ("K1", "K1"), ("K2", "K2"),
                                                       ("WTW", "WTW (mm)")]:
                             if f"{meas_label}:" in cell_text_upper:
                                 # Extract value after the colon
@@ -328,7 +328,7 @@ class IOL700Parser(BaseParser):
                                 # Check if first line is a measurement label
                                 for meas_label, excel_col in [("AL", "AL"), ("CCT", "PACHY (mm)"), 
                                                               ("ACD", "ACD epit"), ("LT", "LT"),
-                                                              ("K1", "PUISSANCE IOL"), ("K2", "TORIQUE PROG EDOF"),
+                                                              ("K1", "K1"), ("K2", "K2"),
                                                               ("WTW", "WTW (mm)")]:
                                     if meas_label in first_line:
                                         # Extract value from second line (remove units)
@@ -359,7 +359,7 @@ class IOL700Parser(BaseParser):
                                 cell_text_upper = cell_text.upper()
                                 for meas_label, excel_col in [("AL", "AL"), ("CCT", "PACHY (mm)"), 
                                                               ("ACD", "ACD epit"), ("LT", "LT"),
-                                                              ("K1", "PUISSANCE IOL"), ("K2", "TORIQUE PROG EDOF"),
+                                                              ("K1", "K1"), ("K2", "K2"),
                                                               ("WTW", "WTW (mm)")]:
                                     if meas_label in cell_text_upper and excel_col not in od_data:
                                         val = self._extract_value_from_text(cell_text, meas_label)
@@ -367,13 +367,13 @@ class IOL700Parser(BaseParser):
                                             od_data[excel_col] = val
                                             logger.info(f"    OD: {excel_col} = {val} (from column {col_idx})")
                                 
-                                # Extract "Modèle implanté" - look for "@" followed by number and degree symbol
+                                # Extract "axe" - look for "@" followed by number and degree symbol
                                 # Check if K1 is in this cell (since "@" is next to K1)
-                                if "K1" in cell_text_upper and "Modèle implanté" not in od_data:
+                                if "K1" in cell_text_upper and "axe" not in od_data:
                                     modele_val = self._extract_modele_implante(cell_text, row, col_idx)
                                     if modele_val:
-                                        od_data["Modèle implanté"] = modele_val
-                                        logger.info(f"    OD: Modèle implanté = {modele_val} (from column {col_idx})")
+                                        od_data["axe"] = modele_val
+                                        logger.info(f"    OD: axe = {modele_val} (from column {col_idx})")
                         else:  # OS columns (4+)
                             cell = row[col_idx]
                             if cell:
@@ -381,7 +381,7 @@ class IOL700Parser(BaseParser):
                                 cell_text_upper = cell_text.upper()
                                 for meas_label, excel_col in [("AL", "AL"), ("CCT", "PACHY (mm)"), 
                                                               ("ACD", "ACD epit"), ("LT", "LT"),
-                                                              ("K1", "PUISSANCE IOL"), ("K2", "TORIQUE PROG EDOF"),
+                                                              ("K1", "K1"), ("K2", "K2"),
                                                               ("WTW", "WTW (mm)")]:
                                     if meas_label in cell_text_upper and excel_col not in os_data:
                                         val = self._extract_value_from_text(cell_text, meas_label)
@@ -389,13 +389,13 @@ class IOL700Parser(BaseParser):
                                             os_data[excel_col] = val
                                             logger.info(f"    OS: {excel_col} = {val} (from column {col_idx})")
                                 
-                                # Extract "Modèle implanté" - look for "@" followed by number and degree symbol
+                                # Extract "axe" - look for "@" followed by number and degree symbol
                                 # Check if K1 is in this cell (since "@" is next to K1)
-                                if "K1" in cell_text_upper and "Modèle implanté" not in os_data:
+                                if "K1" in cell_text_upper and "axe" not in os_data:
                                     modele_val = self._extract_modele_implante(cell_text, row, col_idx)
                                     if modele_val:
-                                        os_data["Modèle implanté"] = modele_val
-                                        logger.info(f"    OS: Modèle implanté = {modele_val} (from column {col_idx})")
+                                        os_data["axe"] = modele_val
+                                        logger.info(f"    OS: axe = {modele_val} (from column {col_idx})")
             
             # Fallback: try the original method if no structured extraction worked
             if not od_data and not os_data:
@@ -533,7 +533,7 @@ class IOL700Parser(BaseParser):
         return ""
     
     def _extract_modele_implante(self, cell_text: str, row: List, col_idx: int) -> str:
-        """Extract 'Modèle implanté' value - looks for '@' followed by number and degree symbol."""
+        """Extract 'axe' value - looks for '@' followed by number and degree symbol."""
         import re
         # Pattern: "@" followed by optional spaces, then number, then degree symbol (°)
         # Look in current cell first
@@ -613,17 +613,17 @@ class IOL700Parser(BaseParser):
             lt = self._extract_numeric_field(text, rf"LT[:\s]+([\d.,]+).*?{eye}", "LT")
         data["LT"] = lt.replace(",", ".") if lt else ""
         
-        # Extract K1 -> PUISSANCE IOL
+        # Extract K1 -> K1
         k1 = self._extract_numeric_field(text, rf"{eye_pattern}.*?K1[:\s]+([\d.,]+)", "K1")
         if not k1:
             k1 = self._extract_numeric_field(text, rf"K1[:\s]+([\d.,]+).*?{eye}", "K1")
-        data["PUISSANCE IOL"] = k1.replace(",", ".") if k1 else ""
+        data["K1"] = k1.replace(",", ".") if k1 else ""
         
-        # Extract K2 -> TORIQUE PROG EDOF
+        # Extract K2 -> K2
         k2 = self._extract_numeric_field(text, rf"{eye_pattern}.*?K2[:\s]+([\d.,]+)", "K2")
         if not k2:
             k2 = self._extract_numeric_field(text, rf"K2[:\s]+([\d.,]+).*?{eye}", "K2")
-        data["TORIQUE PROG EDOF"] = k2.replace(",", ".") if k2 else ""
+        data["K2"] = k2.replace(",", ".") if k2 else ""
         
         # Extract WTW (White-to-White)
         wtw = self._extract_numeric_field(text, rf"{eye_pattern}.*?WTW[:\s]+([\d.,]+)", "WTW")
