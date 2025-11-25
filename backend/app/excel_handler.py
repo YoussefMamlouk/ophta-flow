@@ -233,7 +233,18 @@ def merge_excel_data(
                 col_idx = column_map.get(field_name)
                 
                 if col_idx is not None:
-                    logger.info(f"  Processing field '{field_name}' = '{value}' (type: {type(value).__name__}), found column {col_idx}")
+                    # Double-check: for K1, K2, Axe, ensure we're using the first occurrence (columns 10, 11, 12)
+                    if field_name == "K1" and col_idx != 10:
+                        logger.error(f"  ERROR: K1 mapped to column {col_idx} instead of 10! Using column 10.")
+                        col_idx = 10
+                    elif field_name == "K2" and col_idx != 12:
+                        logger.error(f"  ERROR: K2 mapped to column {col_idx} instead of 12! Using column 12.")
+                        col_idx = 12
+                    elif field_name == "Axe" and col_idx != 11:
+                        logger.error(f"  ERROR: Axe mapped to column {col_idx} instead of 11! Using column 11.")
+                        col_idx = 11
+                    
+                    logger.info(f"  Processing field '{field_name}' = '{value}' (type: {type(value).__name__}), writing to column {col_idx}")
                     cell = ws.cell(row=new_row_idx, column=col_idx)
                     
                     # Convert value to appropriate type
