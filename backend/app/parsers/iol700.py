@@ -439,21 +439,35 @@ class IOL700Parser(BaseParser):
         
         if od_data or os_data:
             if not od_data:
-                od_data = {"Œil": "OD", "ID Patient": patient_id, "Âge": age}
+                od_data = {"Œil": "OD", "ID Patient": patient_id, "Âge": age, "K1": "", "K2": "", "Axe": ""}
                 logger.info("OD data was empty, creating default")
             else:
                 od_data["Œil"] = "OD"
                 od_data["ID Patient"] = patient_id
                 od_data["Âge"] = age
+                # Ensure K1, K2, and Axe are always present
+                if "K1" not in od_data:
+                    od_data["K1"] = ""
+                if "K2" not in od_data:
+                    od_data["K2"] = ""
+                if "Axe" not in od_data:
+                    od_data["Axe"] = ""
                 logger.info(f"OD data populated: {od_data}")
             
             if not os_data:
-                os_data = {"Œil": "OS", "ID Patient": patient_id, "Âge": age}
+                os_data = {"Œil": "OS", "ID Patient": patient_id, "Âge": age, "K1": "", "K2": "", "Axe": ""}
                 logger.info("OS data was empty, creating default")
             else:
                 os_data["Œil"] = "OS"
                 os_data["ID Patient"] = patient_id
                 os_data["Âge"] = age
+                # Ensure K1, K2, and Axe are always present
+                if "K1" not in os_data:
+                    os_data["K1"] = ""
+                if "K2" not in os_data:
+                    os_data["K2"] = ""
+                if "Axe" not in os_data:
+                    os_data["Axe"] = ""
                 logger.info(f"OS data populated: {os_data}")
             
             return od_data, os_data
@@ -630,6 +644,23 @@ class IOL700Parser(BaseParser):
         if not wtw:
             wtw = self._extract_numeric_field(text, rf"WTW[:\s]+([\d.,]+).*?{eye}", "WTW")
         data["WTW (mm)"] = wtw.replace(",", ".") if wtw else ""
+        
+        # Extract Axe (Modèle implanté) - look for "@" followed by number and degree symbol
+        # Try to find it near K1 in the text
+        axe_pattern = rf"{eye_pattern}.*?@\s*(\d+)\s*°"
+        axe_match = re.search(axe_pattern, text, re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        if not axe_match:
+            # Try without eye pattern
+            axe_pattern = r"@\s*(\d+)\s*°"
+            axe_match = re.search(axe_pattern, text, re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        if not axe_match:
+            # Try without degree symbol
+            axe_pattern = rf"{eye_pattern}.*?@\s*(\d+)"
+            axe_match = re.search(axe_pattern, text, re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        if not axe_match:
+            axe_pattern = r"@\s*(\d+)"
+            axe_match = re.search(axe_pattern, text, re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        data["Axe"] = axe_match.group(1) if axe_match else ""
         
         return data
     

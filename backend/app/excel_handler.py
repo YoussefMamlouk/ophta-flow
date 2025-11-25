@@ -67,7 +67,7 @@ def merge_excel_data(
             header_value = str(cell.value).strip()
             if header_value:  # Only add non-empty headers
                 column_map[header_value] = col_idx
-                logger.debug(f"Found header '{header_value}' at column {col_idx}")
+                logger.info(f"Found header '{header_value}' at column {col_idx}")
     
     if not column_map:
         # If no headers found, try row 1
@@ -216,25 +216,12 @@ def merge_excel_data(
             # Write data to appropriate columns only
             # This preserves any formulas in other columns
             logger.info(f"Writing data to row {new_row_idx}")
-            
-            # Map new field names to old column names (for backward compatibility)
-            field_name_mapping = {
-                "K1": "PUISSANCE IOL",
-                "K2": "TORIQUE PROG EDOF",
-                "Axe": "Modèle implanté"
-            }
+            logger.info(f"Available columns in Excel: {list(column_map.keys())}")
+            logger.info(f"Data keys to write: {list(row_data.keys())}")
             
             written_count = 0
             for field_name, value in row_data.items():
-                # Try to find column using field_name first
                 col_idx = column_map.get(field_name)
-                
-                # If not found, try alternative name (for backward compatibility)
-                if col_idx is None and field_name in field_name_mapping:
-                    alt_name = field_name_mapping[field_name]
-                    col_idx = column_map.get(alt_name)
-                    if col_idx:
-                        logger.info(f"  Using alternative column name '{alt_name}' for '{field_name}'")
                 
                 if col_idx is not None:
                     cell = ws.cell(row=new_row_idx, column=col_idx)
@@ -287,7 +274,7 @@ def merge_excel_data(
                     written_count += 1
                     logger.info(f"  ✓ Written '{field_name}' = '{converted_value}' ({type(converted_value).__name__}) to column {col_idx} (row {new_row_idx})")
                 else:
-                    logger.warning(f"  ✗ Field '{field_name}' not found in column_map (tried: {field_name}, {field_name_mapping.get(field_name, 'N/A')})")
+                    logger.warning(f"  ✗ Field '{field_name}' not found in column_map. Available columns: {list(column_map.keys())}")
             
             logger.info(f"Row {new_row_idx}: Written {written_count}/{len(row_data)} fields")
             # Move to next row for next iteration
