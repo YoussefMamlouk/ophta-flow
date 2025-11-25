@@ -66,8 +66,12 @@ def merge_excel_data(
         if cell.value:
             header_value = str(cell.value).strip()
             if header_value:  # Only add non-empty headers
-                column_map[header_value] = col_idx
-                logger.info(f"Found header '{header_value}' at column {col_idx}")
+                # Only add if not already present (use first occurrence, not last)
+                if header_value not in column_map:
+                    column_map[header_value] = col_idx
+                    logger.info(f"Found header '{header_value}' at column {col_idx}")
+                else:
+                    logger.warning(f"Duplicate header '{header_value}' found at column {col_idx}, using first occurrence at column {column_map[header_value]}")
     
     if not column_map:
         # If no headers found, try row 1
@@ -78,8 +82,12 @@ def merge_excel_data(
             if cell.value:
                 header_value = str(cell.value).strip()
                 if header_value:  # Only add non-empty headers
-                    column_map[header_value] = col_idx
-                    logger.debug(f"Found header '{header_value}' at column {col_idx}")
+                    # Only add if not already present (use first occurrence, not last)
+                    if header_value not in column_map:
+                        column_map[header_value] = col_idx
+                        logger.info(f"Found header '{header_value}' at column {col_idx}")
+                    else:
+                        logger.warning(f"Duplicate header '{header_value}' found at column {col_idx}, using first occurrence at column {column_map[header_value]}")
     
     logger.info(f"Found {len(column_map)} column headers: {list(column_map.keys())}")
     
