@@ -112,6 +112,13 @@ class IOL700Parser(BaseParser):
             od_data["ID Patient"] = patient_id
             od_data["Âge"] = age
             od_data["Œil"] = "OD"
+            # Ensure K1, K2, and Axe are always present
+            if "K1" not in od_data:
+                od_data["K1"] = ""
+            if "K2" not in od_data:
+                od_data["K2"] = ""
+            if "Axe" not in od_data:
+                od_data["Axe"] = ""
             logger.debug(f"OD data extracted: {od_data}")
             
             # Extract OS (left eye, right column) values
@@ -119,6 +126,13 @@ class IOL700Parser(BaseParser):
             os_data["ID Patient"] = patient_id
             os_data["Âge"] = age
             os_data["Œil"] = "OS"
+            # Ensure K1, K2, and Axe are always present
+            if "K1" not in os_data:
+                os_data["K1"] = ""
+            if "K2" not in os_data:
+                os_data["K2"] = ""
+            if "Axe" not in os_data:
+                os_data["Axe"] = ""
             logger.debug(f"OS data extracted: {os_data}")
             
             logger.info(f"Returning {len([od_data, os_data])} rows")

@@ -218,17 +218,22 @@ def merge_excel_data(
             logger.info(f"Writing data to row {new_row_idx}")
             logger.info(f"Available columns in Excel: {list(column_map.keys())}")
             logger.info(f"Data keys to write: {list(row_data.keys())}")
+            logger.info(f"Data values: {row_data}")
             
             written_count = 0
             for field_name, value in row_data.items():
                 col_idx = column_map.get(field_name)
                 
                 if col_idx is not None:
+                    logger.info(f"  Processing field '{field_name}' = '{value}' (type: {type(value).__name__}), found column {col_idx}")
                     cell = ws.cell(row=new_row_idx, column=col_idx)
                     
                     # Convert value to appropriate type
                     converted_value = value
-                    if value is not None and value != "":
+                    # Handle empty strings - convert to None for Excel, or keep as empty string
+                    if value == "":
+                        converted_value = ""  # Keep empty string for now
+                    elif value is not None and value != "":
                         # Try to convert numeric strings to numbers
                         if isinstance(value, str):
                             # Clean Patient ID - extract only digits and convert to integer
@@ -270,11 +275,15 @@ def merge_excel_data(
                     
                     # Set the value (cell is new/empty, so no formula to preserve)
                     # Formatting already copied above
-                    cell.value = converted_value
+                    # Always write the value, even if it's an empty string
+                    cell.value = converted_value if converted_value != "" else None
                     written_count += 1
                     logger.info(f"  ✓ Written '{field_name}' = '{converted_value}' ({type(converted_value).__name__}) to column {col_idx} (row {new_row_idx})")
                 else:
                     logger.warning(f"  ✗ Field '{field_name}' not found in column_map. Available columns: {list(column_map.keys())}")
+                    # Special check for K1, K2, Axe to help debug
+                    if field_name in ["K1", "K2", "Axe"]:
+                        logger.error(f"  CRITICAL: {field_name} column not found in Excel! This field will not be written.")
             
             logger.info(f"Row {new_row_idx}: Written {written_count}/{len(row_data)} fields")
             # Move to next row for next iteration
